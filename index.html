@@ -289,12 +289,91 @@
         .random-button:hover {
             background-color: #7B1FA2;
         }
+
+        .input-container {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+        }
+
+        .input-group {
+            margin-bottom: 10px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .input-group input {
+            padding: 8px;
+            width: 200px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .input-group input:focus {
+            border-color: #2196F3;
+            outline: none;
+        }
+
+        .error-message {
+            color: #D32F2F;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .complete-random-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 20px;
+            background-color: #FF9800;  /* Orange color to differentiate */
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .complete-random-button:hover {
+            background-color: #F57C00;
+        }
+
+        .button-instructions {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+        }
+
+        .instruction {
+            margin: 8px 0;
+            font-size: 16px;
+            color: #666;
+        }
+
+        .instruction-title {
+            font-weight: bold;
+            color: #333;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Lab Seat Preference Selector</h1>
         <p>Click on seats in order of preference. Selected seats will turn green.</p>
+        
+        <div class="input-container">
+            <div class="input-group">
+                <label for="userName">Your Name:</label>
+                <input type="text" id="userName" placeholder="Enter your name">
+            </div>
+            <div class="input-group">
+                <label for="currentSeat">Current Seat:</label>
+                <input type="number" id="currentSeat" min="1" max="49" placeholder="Enter your current seat number">
+            </div>
+        </div>
         
         <div class="lab-layout">
 
@@ -354,12 +433,34 @@
             <button class="reset-button" onclick="resetSelection()">Reset Selection</button>
             <button class="default-button" onclick="chooseDefault()">Choose Default</button>
             <button class="random-button" onclick="chooseRandom()">Random Order</button>
+            <button class="complete-random-button" onclick="completeRandom()">Complete Random</button>
+        </div>
+
+        <div class="button-instructions">
+            <div class="instruction">
+                <span class="instruction-title">Reset Selection:</span>
+                Clear all selected seats and start over
+            </div>
+            <div class="instruction">
+                <span class="instruction-title">Choose Default:</span>
+                Use a pre-defined optimal seating sequence (excluding your current seat)
+            </div>
+            <div class="instruction">
+                <span class="instruction-title">Random Order:</span>
+                Generate a completely random sequence for all seats (excluding your current seat)
+            </div>
+            <div class="instruction">
+                <span class="instruction-title">Complete Random:</span>
+                Randomly fill in remaining unselected seats while keeping your current selections
+            </div>
         </div>
     </div>
 
     <script>
         const totalSeats = 49;
         let selectedSeats = [];
+        let userName = '';
+        let currentSeat = null;
 
         const defaultSequence = [11, 3, 4, 14, 31, 16, 13, 15, 12, 29, 5, 27, 6, 30, 48, 47, 10, 1, 28, 2, 7, 8, 19, 9, 20, 33, 37, 18, 32, 45, 22, 46, 25, 43, 44, 24, 26, 21, 23, 39, 41, 42, 36, 38, 17, 40, 35, 34, 49];
 
@@ -407,7 +508,46 @@
             labMap.appendChild(lastSeat);
         }
 
+        function validateInputs() {
+            const nameInput = document.getElementById('userName');
+            const currentSeatInput = document.getElementById('currentSeat');
+            const warningMessage = document.getElementById('warningMessage');
+
+            if (!nameInput.value.trim()) {
+                warningMessage.textContent = 'Please enter your name first!';
+                warningMessage.style.display = 'block';
+                return false;
+            }
+
+            if (!currentSeatInput.value || 
+                isNaN(currentSeatInput.value) || 
+                currentSeatInput.value < 1 || 
+                currentSeatInput.value > 49) {
+                warningMessage.textContent = 'Please enter a valid current seat number (1-49)!';
+                warningMessage.style.display = 'block';
+                return false;
+            }
+
+            userName = nameInput.value.trim();
+            currentSeat = parseInt(currentSeatInput.value);
+            return true;
+        }
+
         function selectSeat(seatNumber) {
+            if (!validateInputs()) {
+                return;
+            }
+
+            if (seatNumber === currentSeat) {
+                const warningMessage = document.getElementById('warningMessage');
+                warningMessage.textContent = 'You cannot select your current seat!';
+                warningMessage.style.display = 'block';
+                setTimeout(() => {
+                    warningMessage.style.display = 'none';
+                }, 3000);
+                return;
+            }
+
             const index = selectedSeats.indexOf(seatNumber);
             if (index > -1) {
                 // Deselect the seat
@@ -464,12 +604,11 @@
         }
 
         function copySequence() {
-            if (selectedSeats.length < totalSeats) {
+            if (selectedSeats.length < totalSeats - 1) {  // -1 because current seat is excluded
                 const warningMessage = document.getElementById('warningMessage');
-                warningMessage.textContent = `Please select all ${totalSeats} seats first! (${selectedSeats.length} selected)`;
+                warningMessage.textContent = `Please select all seats except your current seat! (${selectedSeats.length} selected)`;
                 warningMessage.style.display = 'block';
                 
-                // Hide the warning after 3 seconds
                 setTimeout(() => {
                     warningMessage.style.display = 'none';
                 }, 3000);
@@ -477,14 +616,14 @@
                 return;
             }
 
-            const sequence = selectedSeats.join(', ');
+            const sequence = `${userName}, ${currentSeat}, ${selectedSeats.join(', ')}`;
             navigator.clipboard.writeText(sequence).then(() => {
                 const copyButton = document.querySelector('.copy-button');
                 const originalText = copyButton.textContent;
                 copyButton.textContent = 'Copied!';
                 setTimeout(() => {
                     copyButton.textContent = originalText;
-                }, 2000);
+                }, 500);
             }).catch(err => {
                 console.error('Failed to copy sequence:', err);
                 alert('Failed to copy sequence to clipboard');
@@ -492,21 +631,22 @@
         }
 
         function chooseDefault() {
-            // First reset current selection
+            if (!validateInputs()) {
+                return;
+            }
+
             resetSelection();
             
-            // Select seats in the default sequence
-            selectedSeats = [...defaultSequence];
+            // Filter out current seat from default sequence
+            selectedSeats = defaultSequence.filter(seat => seat !== currentSeat);
             
-            // Update the visual appearance of seats
             const seats = document.getElementsByClassName('seat');
             Array.from(seats).forEach(seat => {
-                if (defaultSequence.includes(parseInt(seat.textContent))) {
+                if (selectedSeats.includes(parseInt(seat.textContent))) {
                     seat.classList.add('selected');
                 }
             });
             
-            // Update the display
             updateDisplay();
         }
 
@@ -519,20 +659,60 @@
         }
 
         function chooseRandom() {
-            // First reset current selection
+            if (!validateInputs()) {
+                return;
+            }
+
             resetSelection();
             
-            // Create array of all seat numbers and shuffle it
-            const allSeats = Array.from({length: totalSeats}, (_, i) => i + 1);
+            // Create array of all seats except current seat
+            const allSeats = Array.from({length: totalSeats}, (_, i) => i + 1)
+                .filter(seat => seat !== currentSeat);
             selectedSeats = shuffleArray(allSeats);
+            
+            const seats = document.getElementsByClassName('seat');
+            Array.from(seats).forEach(seat => {
+                if (selectedSeats.includes(parseInt(seat.textContent))) {
+                    seat.classList.add('selected');
+                }
+            });
+            
+            updateDisplay();
+        }
+
+        function completeRandom() {
+            if (!validateInputs()) {
+                return;
+            }
+
+            // Get all available seats (excluding current seat and already selected seats)
+            const availableSeats = Array.from({length: totalSeats}, (_, i) => i + 1)
+                .filter(seat => seat !== currentSeat && !selectedSeats.includes(seat));
+                
+            if (availableSeats.length === 0) {
+                const warningMessage = document.getElementById('warningMessage');
+                warningMessage.textContent = 'All seats are already selected!';
+                warningMessage.style.display = 'block';
+                setTimeout(() => {
+                    warningMessage.style.display = 'none';
+                }, 3000);
+                return;
+            }
+
+            // Shuffle remaining seats
+            const remainingSeats = shuffleArray([...availableSeats]);
+            
+            // Add shuffled seats to selection
+            selectedSeats = [...selectedSeats, ...remainingSeats];
             
             // Update the visual appearance of seats
             const seats = document.getElementsByClassName('seat');
             Array.from(seats).forEach(seat => {
-                seat.classList.add('selected');
+                if (selectedSeats.includes(parseInt(seat.textContent))) {
+                    seat.classList.add('selected');
+                }
             });
             
-            // Update the display
             updateDisplay();
         }
 
