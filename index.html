@@ -90,8 +90,15 @@
             visibility: hidden;
         }
 
+        .sequence-container {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
         .sequence-display {
-            margin-top: 20px;
+            margin-top: 0;
+            flex-grow: 1;
             padding: 10px;
             border: 1px solid #ccc;
             min-height: 50px;
@@ -100,6 +107,7 @@
         .reset-button {
             margin-top: 20px;
             padding: 10px 20px;
+            font-size: 20px;
             background-color: #f44336;
             color: white;
             border: none;
@@ -231,6 +239,56 @@
                 overflow-x: auto;
             }
         }
+
+        .copy-button {
+            margin-top: 0;
+            padding: 8px 16px;
+            font-size: 15px;
+            background-color: #63a4d9;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .copy-button:hover {
+            background-color: #1976D2;
+        }
+
+        .warning-message {
+            color: #D32F2F;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;  /* Hidden by default */
+        }
+
+        .default-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 20px;
+            background-color: #4CAF50;  /* Green color to differentiate from reset button */
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .default-button:hover {
+            background-color: #45a049;
+        }
+
+        .random-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 20px;
+            background-color: #9C27B0;  /* Purple color to differentiate */
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .random-button:hover {
+            background-color: #7B1FA2;
+        }
     </style>
 </head>
 <body>
@@ -285,15 +343,25 @@
         
         <div>
             <h3>Your Preference Sequence:</h3>
-            <div class="sequence-display" id="sequenceDisplay"></div>
+            <div class="sequence-container">
+                <div class="sequence-display" id="sequenceDisplay"></div>
+                <button class="copy-button" onclick="copySequence()">Copy to Clipboard</button>
+            </div>
+            <div id="warningMessage" class="warning-message"></div>
         </div>
         
-        <button class="reset-button" onclick="resetSelection()">Reset Selection</button>
+        <div style="display: flex; gap: 10px;">
+            <button class="reset-button" onclick="resetSelection()">Reset Selection</button>
+            <button class="default-button" onclick="chooseDefault()">Choose Default</button>
+            <button class="random-button" onclick="chooseRandom()">Random Order</button>
+        </div>
     </div>
 
     <script>
         const totalSeats = 49;
         let selectedSeats = [];
+
+        const defaultSequence = [11, 3, 4, 14, 31, 16, 2, 15, 12, 29, 5, 27, 6, 30, 13, 47, 10, 1, 28, 18, 7, 8, 19, 33, 20, 9, 37, 21, 32, 45, 22, 46, 25, 23, 43, 44, 24, 26, 39, 41, 42, 36, 38, 17, 40, 48, 35, 34, 49];
 
         function createLabMap() {
             const labMap = document.getElementById('labMap');
@@ -370,9 +438,14 @@
 
         function updateDisplay() {
             const sequenceDisplay = document.getElementById('sequenceDisplay');
+            const warningMessage = document.getElementById('warningMessage');
+            
             sequenceDisplay.textContent = selectedSeats.length > 0 ? 
-                `(${selectedSeats.join(', ')})` : 
+                `${selectedSeats.join(', ')}` : 
                 'No seats selected';
+            
+            // Clear warning message when selection changes
+            warningMessage.style.display = 'none';
         }
 
         function resetSelection() {
@@ -384,6 +457,83 @@
             for (let seat of seats) {
                 seat.classList.remove('selected');
             }
+            
+            // Clear warning message on reset
+            const warningMessage = document.getElementById('warningMessage');
+            warningMessage.style.display = 'none';
+        }
+
+        function copySequence() {
+            if (selectedSeats.length < totalSeats) {
+                const warningMessage = document.getElementById('warningMessage');
+                warningMessage.textContent = `Please select all ${totalSeats} seats first! (${selectedSeats.length} selected)`;
+                warningMessage.style.display = 'block';
+                
+                // Hide the warning after 3 seconds
+                setTimeout(() => {
+                    warningMessage.style.display = 'none';
+                }, 3000);
+                
+                return;
+            }
+
+            const sequence = selectedSeats.join(', ');
+            navigator.clipboard.writeText(sequence).then(() => {
+                const copyButton = document.querySelector('.copy-button');
+                const originalText = copyButton.textContent;
+                copyButton.textContent = 'Copied!';
+                setTimeout(() => {
+                    copyButton.textContent = originalText;
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy sequence:', err);
+                alert('Failed to copy sequence to clipboard');
+            });
+        }
+
+        function chooseDefault() {
+            // First reset current selection
+            resetSelection();
+            
+            // Select seats in the default sequence
+            selectedSeats = [...defaultSequence];
+            
+            // Update the visual appearance of seats
+            const seats = document.getElementsByClassName('seat');
+            Array.from(seats).forEach(seat => {
+                if (defaultSequence.includes(parseInt(seat.textContent))) {
+                    seat.classList.add('selected');
+                }
+            });
+            
+            // Update the display
+            updateDisplay();
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function chooseRandom() {
+            // First reset current selection
+            resetSelection();
+            
+            // Create array of all seat numbers and shuffle it
+            const allSeats = Array.from({length: totalSeats}, (_, i) => i + 1);
+            selectedSeats = shuffleArray(allSeats);
+            
+            // Update the visual appearance of seats
+            const seats = document.getElementsByClassName('seat');
+            Array.from(seats).forEach(seat => {
+                seat.classList.add('selected');
+            });
+            
+            // Update the display
+            updateDisplay();
         }
 
         // Initialize the lab map when the page loads
