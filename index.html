@@ -70,6 +70,18 @@
             height: 130px;
             background-color: lightgrey;
             z-index: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+        }
+
+        .motion-desk::after {
+            content: 'motion desks';
+            color: black;
+            font-size: 17px;
+            text-align: center;
         }
 
         .empty-space {
@@ -228,11 +240,11 @@
         
         <div class="lab-layout">
 
-            <div class="table table-end" style="left: -10px;"></div>
+            <div class="table table-end" style="left: -20px;"></div>
             <div class="table table-end" style="left: 450px;"></div>
             <div class="table table-end" style="left: 600px;"></div>
     
-            <div class="table table-end-right" style="left: 1060px;"></div>
+            <div class="table table-end-right" style="left: 1065px;"></div>
             
             <div class="table table-vertical" style="left: 60px;"></div>
             <div class="table table-vertical" style="left: 105px;"></div>
@@ -248,8 +260,8 @@
             <div class="table table-vertical" style="left: 930px;"></div>
             <div class="table table-vertical" style="left: 975px;"></div>            
 
-            <div class="table motion-desk" style="top: 67px; left: -7px;"></div>      
-            <div class="table motion-desk" style="top: 137px; left: 1063px;"></div>        
+            <div class="table motion-desk" style="top: 67px; left: -17px;"></div>      
+            <div class="table motion-desk" style="top: 137px; left: 1068px;"></div>        
             
             <div class="table door" style="top: 270px; left: 0px;"></div>
             <div class="table door" style="top: 270px; left: 530px;"></div>
