@@ -2,5 +2,4 @@
 
 Click here -> https://jinsingsangsung.github.io/where2sit/ to generate your *preference sequence*.
 
-
-![Screenshot 2025-02-03 at 16 14 40](https://github.com/user-attachments/assets/abbc5e70-2667-4735-93d9-2727972f0b85)
+![Screenshot 2025-02-03 at 19 30 59](https://github.com/user-attachments/assets/382231aa-5aba-4f00-a328-91316696bdc5)
