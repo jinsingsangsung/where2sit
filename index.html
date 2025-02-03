@@ -11,6 +11,12 @@
             padding: 20px;
         }
 
+        .lab-layout {
+            position: relative;
+            width: fit-content;
+            margin: 0 auto;
+        }
+
         .lab-map {
             display: grid;
             grid-template-columns: 30px 80px 30px 80px 30px 80px 30px 30px 130px 30px 80px 30px 80px 30px 80px 30px 80px;
@@ -29,6 +35,8 @@
             justify-content: center;
             cursor: pointer;
             background-color: white;
+            position: relative;
+            z-index: 2;
         }
 
         .seat.selected {
@@ -40,7 +48,6 @@
             position: absolute;
             background-color: #cdbd70;
             z-index: -1;
-            top: 145px;
         }
 
         .table-vertical {
@@ -62,6 +69,7 @@
             width: 24px;
             height: 130px;
             background-color: lightgrey;
+            z-index: 0;
         }
 
         .empty-space {
@@ -93,7 +101,7 @@
             background-color: brown;
             color: white;
             border: none;
-            z-index: -1;
+            z-index: 1;
         }
         .door::after {
             content: 'Door';
@@ -110,7 +118,7 @@
             background-color: skyblue;
             color: black;
             border: 1px solid black;
-            z-index: -1;
+            z-index: 1;
         }
         .water::after {
             content: 'Water';
@@ -126,7 +134,7 @@
             background-color: beige;
             color: black;
             border: 1px solid black;
-            z-index: -1;
+            z-index: 1;
         }
         .coffee::after {
             content: 'Coffee';
@@ -143,7 +151,7 @@
             background-color: rgb(153, 217, 209);
             color: black;
             border: 1px solid black;
-            z-index: -1;
+            z-index: 1;
         }
         .fridge::after {
             content: 'Fridge';
@@ -160,7 +168,7 @@
             background-color: rgb(232, 199, 141);
             color: black;
             border: 1px solid black;
-            z-index: -1;
+            z-index: 1;
         }
         .microwave::after {
             content: 'Microwave';
@@ -177,7 +185,7 @@
             background-color: rgb(233, 200, 232);
             color: black;
             border: 1px solid black;
-            z-index: -1;
+            z-index: 1;
         }
         .airconditioner::after {
             content: 'AC';
@@ -187,6 +195,30 @@
             color: black;
         }   
 
+        /* Update positioning for tables and other elements using percentages instead of fixed pixels */
+        .table.table-end { left: 0%; }
+        .table.table-end-right { right: 19.5%; }
+
+        .table.table-vertical { left: 5%; }
+        
+        .table.motion-desk { top: 212px; left: 0%; }
+
+        .table.door { top: 460px; left: 0%; }
+
+        .table.water { right: 50.8%; }
+        .table.coffee { right: 55.8%; }
+        .table.fridge { left: 45%; }
+        .table.microwave { left: 33.3%; }
+
+        .table.airconditioner:nth-of-type(1) { top: 200px; left: 12.25%; }
+
+        /* Add a minimum width to prevent layout breaking on very small screens */
+        @media (max-width: 1200px) {
+            .container {
+                min-width: 1000px;
+                overflow-x: auto;
+            }
+        }
     </style>
 </head>
 <body>
@@ -196,56 +228,45 @@
         
         <div class="lab-layout">
 
-            <!-- Tables on the left side of 1st and 9th columns -->
-            <div class="table table-end" style="left: 110px;"></div>
-            <div class="table table-end" style="left: 570px;"></div>
-            <div class="table table-end" style="left: 720px;"></div>
+            <div class="table table-end" style="left: -10px;"></div>
+            <div class="table table-end" style="left: 450px;"></div>
+            <div class="table table-end" style="left: 600px;"></div>
+    
+            <div class="table table-end-right" style="left: 1060px;"></div>
             
-            <!-- Table on the right side of 8th column -->
-            <!-- <div class="table table-end" style="left: 380px;"></div> -->
+            <div class="table table-vertical" style="left: 60px;"></div>
+            <div class="table table-vertical" style="left: 105px;"></div>
+            <div class="table table-vertical" style="left: 190px;"></div>
+            <div class="table table-vertical" style="left: 235px;"></div>
+            <div class="table table-vertical" style="left: 320px;"></div>
+            <div class="table table-vertical" style="left: 365px;"></div>
             
-            <!-- Table on the right side of 16th column -->
-            <div class="table table-end-right" style="right: 235px;"></div>
+            <div class="table table-vertical" style="left: 670px;"></div>
+            <div class="table table-vertical" style="left: 715px;"></div>
+            <div class="table table-vertical" style="left: 800px;"></div>
+            <div class="table table-vertical" style="left: 845px;"></div>
+            <div class="table table-vertical" style="left: 930px;"></div>
+            <div class="table table-vertical" style="left: 975px;"></div>            
+
+            <div class="table motion-desk" style="top: 67px; left: -7px;"></div>      
+            <div class="table motion-desk" style="top: 137px; left: 1063px;"></div>        
             
-            <!-- Tables between columns -->
-            <div class="table table-vertical" style="left: 180px;"></div>
-            <div class="table table-vertical" style="left: 225px;"></div>
-            <div class="table table-vertical" style="left: 310px;"></div>
-            <div class="table table-vertical" style="left: 355px;"></div>
-            <div class="table table-vertical" style="left: 440px;"></div>
-            <div class="table table-vertical" style="left: 485px;"></div>
-            <div class="table table-vertical" style="right: 610px;"></div>
-            <div class="table table-vertical" style="right: 565px;"></div>
-            <div class="table table-vertical" style="right: 480px;"></div>
-            <div class="table table-vertical" style="right: 435px;"></div>
-            <div class="table table-vertical" style="right: 350px;"></div>
-            <div class="table table-vertical" style="right: 305px;"></div>            
-            
-            <div class="table motion-desk" style="top: 212px; left: 113px;"></div>        
-            <div class="table motion-desk" style="top: 282px; right: 237px;"></div>         
-            
-            <!-- Add doors -->
-            <div class="door" style="top: 425px; left: 113px;"></div>
-            <div class="door" style="top: 425px; right: 300px;"></div>
-            <div class="door" style="top: 425px; right: 750px;"></div>
+            <div class="table door" style="top: 270px; left: 0px;"></div>
+            <div class="table door" style="top: 270px; left: 530px;"></div>
+            <div class="table door" style="top: 270px; left: 980px;"></div>
 
-            <!-- Add water -->
-            <div class="water" style="top: 395px; right: 610px;"></div>
+            <div class="water" style="top: 230px; left: 665px;"></div>
 
-            <!-- Add coffee -->
-            <div class="coffee" style="top: 395px; right: 670px;"></div>
+            <div class="coffee" style="top: 230px; left: 610px;"></div>
 
-            <!-- Add fridge -->
-            <div class="fridge" style="top: 395px; left: 540px;"></div>
+            <div class="fridge" style="top: 230px; left: 430px;"></div>
 
-            <!-- Add microwave -->
-            <div class="microwave" style="top: 395px; left: 400px;"></div>
+            <div class="microwave" style="top: 230px; left: 290px;"></div>
 
-            <!-- Add airconditioner -->
-            <div class="airconditioner" style="top: 200px; left: 147px;"></div>
-            <div class="airconditioner" style="top: 200px; left: 405px;"></div>
-            <div class="airconditioner" style="top: 200px; right: 400px;"></div>
-            <div class="airconditioner" style="top: 200px; right: 657px;"></div>
+            <div class="airconditioner" style="top: 55px; left: 27px;"></div>
+            <div class="airconditioner" style="top: 55px; left: 285px;"></div>
+            <div class="airconditioner" style="top: 55px; left: 637px;"></div>
+            <div class="airconditioner" style="top: 55px; left: 896px;"></div>
 
             <div class="lab-map" id="labMap"></div>
         </div>
