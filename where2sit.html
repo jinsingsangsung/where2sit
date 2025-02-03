@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab Seat Preference Selector</title>
+    <style>
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .lab-map {
+            display: grid;
+            grid-template-columns: 30px 80px 30px 80px 30px 80px 30px 30px 130px 30px 80px 30px 80px 30px 80px 30px 80px;
+            gap: 10px;
+            margin-bottom: 30px;
+            position: relative;
+            padding-top: 15px;
+        }
+
+        .seat {
+            width: 30px;
+            height: 30px;
+            border: 2px solid #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            background-color: white;
+        }
+
+        .seat.selected {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .table {
+            position: absolute;
+            background-color: #cdbd70;
+            z-index: -1;
+            top: 145px;
+        }
+
+        .table-vertical {
+            width: 40px;
+            height: 200px;
+        }
+
+        .table-end {
+            width: 30px;
+            height: 200px;
+        }
+
+        .table-end-right {
+            width: 30px;
+            height: 270px;
+        }
+
+        .motion-desk {
+            width: 24px;
+            height: 130px;
+            background-color: lightgrey;
+        }
+
+        .empty-space {
+            width: 60px;
+            height: 60px;
+            visibility: hidden;
+        }
+
+        .sequence-display {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            min-height: 50px;
+        }
+
+        .reset-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .door {
+            position: absolute;
+            width: 40px;
+            height: 17px;
+            background-color: brown;
+            color: white;
+            border: none;
+            z-index: -1;
+        }
+        .door::after {
+            content: 'Door';
+            display: block;
+            text-align: center;
+            font-size: 15px;
+            color: white;
+        }   
+
+        .water {
+            position: absolute;
+            width: 50px;
+            height: 23px;
+            background-color: skyblue;
+            color: black;
+            border: 1px solid black;
+            z-index: -1;
+        }
+        .water::after {
+            content: 'Water';
+            display: block;
+            text-align: center;
+            font-size: 20px;
+            color: black;
+        }   
+        .coffee {
+            position: absolute;
+            width: 50px;
+            height: 23px;
+            background-color: beige;
+            color: black;
+            border: 1px solid black;
+            z-index: -1;
+        }
+        .coffee::after {
+            content: 'Coffee';
+            display: block;
+            text-align: center;
+            font-size: 19px;
+            color: black;
+        }   
+
+        .fridge {
+            position: absolute;
+            width: 50px;
+            height: 23px;
+            background-color: rgb(153, 217, 209);
+            color: black;
+            border: 1px solid black;
+            z-index: -1;
+        }
+        .fridge::after {
+            content: 'Fridge';
+            display: block;
+            text-align: center;
+            font-size: 19px;
+            color: black;
+        }   
+
+        .microwave {
+            position: absolute;
+            width: 68px;
+            height: 23px;
+            background-color: rgb(232, 199, 141);
+            color: black;
+            border: 1px solid black;
+            z-index: -1;
+        }
+        .microwave::after {
+            content: 'Microwave';
+            display: block;
+            text-align: center;
+            font-size: 15px;
+            color: black;
+        }   
+
+        .airconditioner {
+            position: absolute;
+            width: 23px;
+            height: 20px;
+            background-color: rgb(233, 200, 232);
+            color: black;
+            border: 1px solid black;
+            z-index: -1;
+        }
+        .airconditioner::after {
+            content: 'AC';
+            display: block;
+            text-align: center;
+            font-size: 15px;
+            color: black;
+        }   
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Lab Seat Preference Selector</h1>
+        <p>Click on seats in order of preference. Selected seats will turn green.</p>
+        
+        <div class="lab-layout">
+
+            <!-- Tables on the left side of 1st and 9th columns -->
+            <div class="table table-end" style="left: 110px;"></div>
+            <div class="table table-end" style="left: 570px;"></div>
+            <div class="table table-end" style="left: 720px;"></div>
+            
+            <!-- Table on the right side of 8th column -->
+            <!-- <div class="table table-end" style="left: 380px;"></div> -->
+            
+            <!-- Table on the right side of 16th column -->
+            <div class="table table-end-right" style="right: 235px;"></div>
+            
+            <!-- Tables between columns -->
+            <div class="table table-vertical" style="left: 180px;"></div>
+            <div class="table table-vertical" style="left: 225px;"></div>
+            <div class="table table-vertical" style="left: 310px;"></div>
+            <div class="table table-vertical" style="left: 355px;"></div>
+            <div class="table table-vertical" style="left: 440px;"></div>
+            <div class="table table-vertical" style="left: 485px;"></div>
+            <div class="table table-vertical" style="right: 610px;"></div>
+            <div class="table table-vertical" style="right: 565px;"></div>
+            <div class="table table-vertical" style="right: 480px;"></div>
+            <div class="table table-vertical" style="right: 435px;"></div>
+            <div class="table table-vertical" style="right: 350px;"></div>
+            <div class="table table-vertical" style="right: 305px;"></div>            
+            
+            <div class="table motion-desk" style="top: 212px; left: 113px;"></div>        
+            <div class="table motion-desk" style="top: 282px; right: 237px;"></div>         
+            
+            <!-- Add doors -->
+            <div class="door" style="top: 425px; left: 113px;"></div>
+            <div class="door" style="top: 425px; right: 300px;"></div>
+            <div class="door" style="top: 425px; right: 750px;"></div>
+
+            <!-- Add water -->
+            <div class="water" style="top: 395px; right: 610px;"></div>
+
+            <!-- Add coffee -->
+            <div class="coffee" style="top: 395px; right: 670px;"></div>
+
+            <!-- Add fridge -->
+            <div class="fridge" style="top: 395px; left: 540px;"></div>
+
+            <!-- Add microwave -->
+            <div class="microwave" style="top: 395px; left: 400px;"></div>
+
+            <!-- Add airconditioner -->
+            <div class="airconditioner" style="top: 200px; left: 147px;"></div>
+            <div class="airconditioner" style="top: 200px; left: 405px;"></div>
+            <div class="airconditioner" style="top: 200px; right: 400px;"></div>
+            <div class="airconditioner" style="top: 200px; right: 657px;"></div>
+
+            <div class="lab-map" id="labMap"></div>
+        </div>
+        
+        <div>
+            <h3>Your Preference Sequence:</h3>
+            <div class="sequence-display" id="sequenceDisplay"></div>
+        </div>
+        
+        <button class="reset-button" onclick="resetSelection()">Reset Selection</button>
+    </div>
+
+    <script>
+        const totalSeats = 49;
+        let selectedSeats = [];
+
+        function createLabMap() {
+            const labMap = document.getElementById('labMap');
+            let seatCount = 1;
+            
+            for (let row = 0; row < 3; row++) {
+                // First 8 columns (3 seats each)
+                for (let col = 0; col < 8; col++) {
+                    const seatButton = document.createElement('div');
+                    seatButton.className = 'seat';
+                    seatButton.textContent = seatCount++;
+                    seatButton.onclick = () => selectSeat(parseInt(seatButton.textContent));
+                    labMap.appendChild(seatButton);
+                }
+                
+                // Add gap between 8th and 9th column
+                const gap = document.createElement('div');
+                gap.className = 'empty-space';
+                labMap.appendChild(gap);
+                
+                // Last 8 columns (3 seats each)
+                for (let col = 8; col < 16; col++) {
+                    const seatButton = document.createElement('div');
+                    seatButton.className = 'seat';
+                    seatButton.textContent = seatCount++;
+                    seatButton.onclick = () => selectSeat(parseInt(seatButton.textContent));
+                    labMap.appendChild(seatButton);
+                }
+            }
+            
+            // Add empty spaces to position seat 49 under seat 48
+            for (let i = 0; i < 16; i++) {
+                const emptySpace = document.createElement('div');
+                emptySpace.className = 'empty-space';
+                labMap.appendChild(emptySpace);
+            }
+            
+            // Add the 49th seat
+            const lastSeat = document.createElement('div');
+            lastSeat.className = 'seat';
+            lastSeat.textContent = seatCount;
+            lastSeat.onclick = () => selectSeat(parseInt(lastSeat.textContent));
+            labMap.appendChild(lastSeat);
+        }
+
+        function selectSeat(seatNumber) {
+            const index = selectedSeats.indexOf(seatNumber);
+            if (index > -1) {
+                // Deselect the seat
+                selectedSeats.splice(index, 1);
+                
+                // Update seat appearance
+                const seats = document.getElementsByClassName('seat');
+                Array.from(seats).forEach(seat => {
+                    if (seat.textContent == seatNumber) {
+                        seat.classList.remove('selected');
+                    }
+                });
+            } else {
+                // Select the seat
+                selectedSeats.push(seatNumber);
+                
+                // Update seat appearance
+                const seats = document.getElementsByClassName('seat');
+                Array.from(seats).forEach(seat => {
+                    if (seat.textContent == seatNumber) {
+                        seat.classList.add('selected');
+                    }
+                });
+            }
+            
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            const sequenceDisplay = document.getElementById('sequenceDisplay');
+            sequenceDisplay.textContent = selectedSeats.length > 0 ? 
+                `(${selectedSeats.join(', ')})` : 
+                'No seats selected';
+        }
+
+        function resetSelection() {
+            selectedSeats = [];
+            updateDisplay();
+            
+            // Reset all seat appearances
+            const seats = document.getElementsByClassName('seat');
+            for (let seat of seats) {
+                seat.classList.remove('selected');
+            }
+        }
+
+        // Initialize the lab map when the page loads
+        window.onload = createLabMap;
+    </script>
+</body>
+</html>
