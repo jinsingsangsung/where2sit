@@ -357,6 +357,20 @@
             font-weight: bold;
             color: #333;
         }
+
+        .assignment-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 20px;
+            background-color: #2196F3;  /* Blue color to differentiate */
+            color: white;
+            border: none;
+            cursor: pointer;
+}
+
+        .assignment-button:hover {
+            background-color: #1976D2;
+        }
     </style>
 </head>
 <body>
@@ -434,6 +448,7 @@
             <button class="default-button" onclick="chooseDefault()">Choose Default</button>
             <button class="random-button" onclick="chooseRandom()">Random Order</button>
             <button class="complete-random-button" onclick="completeRandom()">Complete Random</button>
+            <button class="random-button" onclick="window.location.href='seat_assignment.html'">Go to Seat Assignment</button>
         </div>
 
         <div class="button-instructions">
