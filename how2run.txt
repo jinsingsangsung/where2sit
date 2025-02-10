@@ -1,0 +1,16 @@
+CVLAB 자리배정 코드 (220125 ver)
+
+0. method 
+
+    우선순위 투표 범위 1~N번 사이에 우선순위 대상자 순번 결정 후 나머지 결정되지않은 표에 대해 다른 학생들 순번 결정 
+
+1. csv 파일 
+    첫 줄 : 우선순위 대상자 
+    둘째 줄 : 전 CVLAB 구성원 모두 (누락 없이 적어주세요, 중복은 에러뜹니다.)
+
+2. command 
+
+    python run.py -priority N (-num_first)
+    
+    - priority : 우선순위 범위(우선순위 학생보다 적을 경우 에러)
+    - num_first : 표기 방법 action switch, 숫자 - 이름, 숫자 오름차순으로 표기 (argument 없을 시 이름 - 숫자, 이름 오름차순으로 표기)
