@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab Seat Preference Selector</title>
+    <style>
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .lab-layout {
+            position: relative;
+            width: fit-content;
+            margin: 0 auto;
+        }
+
+        .lab-map {
+            display: grid;
+            grid-template-columns: 30px 80px 30px 80px 30px 80px 30px 30px 130px 30px 80px 30px 80px 30px 80px 30px 80px;
+            gap: 10px;
+            margin-bottom: 30px;
+            position: relative;
+            padding-top: 15px;
+        }
+
+        .seat {
+            width: 30px;
+            height: 30px;
+            border: 2px solid #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            background-color: white;
+            position: relative;
+            z-index: 2;
+        }
+
+        .seat.selected {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .table {
+            position: absolute;
+            background-color: #cdbd70;
+            z-index: -1;
+        }
+
+        .table-vertical {
+            width: 40px;
+            height: 200px;
+        }
+
+        .table-end {
+            width: 30px;
+            height: 200px;
+        }
+
+        .table-end-right {
+            width: 30px;
+            height: 270px;
+        }
+
+        .motion-desk {
+            width: 24px;
+            height: 130px;
+            background-color: lightgrey;
+            z-index: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+        }
+
+        .motion-desk::after {
+            content: 'motion desks';
+            color: black;
+            font-size: 17px;
+            text-align: center;
+        }
+
+        .empty-space {
+            width: 60px;
+            height: 60px;
+            visibility: hidden;
+        }
+
+        .sequence-container {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .sequence-display {
+            margin-top: 0;
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            min-height: 50px;
+        }
+
+        .reset-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 20px;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .door {
+            position: absolute;
+            width: 40px;
+            height: 17px;
+            background-color: brown;
+            color: white;
+            border: none;
+            z-index: 1;
+        }
+        .door::after {
+            content: 'Door';
+            display: block;
+            text-align: center;
+            font-size: 15px;
+            color: white;
+        }   
+
+        .water {
+            position: absolute;
+            width: 50px;
+            height: 23px;
+            background-color: skyblue;
+            color: black;
+            border: 1px solid black;
+            z-index: 1;
+        }
+        .water::after {
+            content: 'Water';
+            display: block;
+            text-align: center;
+            font-size: 20px;
+            color: black;
+        }   
+        .coffee {
+            position: absolute;
+            width: 50px;
+            height: 23px;
+            background-color: beige;
+            color: black;
+            border: 1px solid black;
+            z-index: 1;
+        }
+        .coffee::after {
+            content: 'Coffee';
+            display: block;
+            text-align: center;
+            font-size: 19px;
+            color: black;
+        }   
+
+        .fridge {
+            position: absolute;
+            width: 50px;
+            height: 23px;
+            background-color: rgb(153, 217, 209);
+            color: black;
+            border: 1px solid black;
+            z-index: 1;
+        }
+        .fridge::after {
+            content: 'Fridge';
+            display: block;
+            text-align: center;
+            font-size: 19px;
+            color: black;
+        }   
+
+        .microwave {
+            position: absolute;
+            width: 68px;
+            height: 23px;
+            background-color: rgb(232, 199, 141);
+            color: black;
+            border: 1px solid black;
+            z-index: 1;
+        }
+        .microwave::after {
+            content: 'Microwave';
+            display: block;
+            text-align: center;
+            font-size: 15px;
+            color: black;
+        }   
+
+        .airconditioner {
+            position: absolute;
+            width: 23px;
+            height: 20px;
+            background-color: rgb(233, 200, 232);
+            color: black;
+            border: 1px solid black;
+            z-index: 1;
+        }
+        .airconditioner::after {
+            content: 'AC';
+            display: block;
+            text-align: center;
+            font-size: 15px;
+            color: black;
+        }   
+
+        /* Update positioning for tables and other elements using percentages instead of fixed pixels */
+        .table.table-end { left: 0%; }
+        .table.table-end-right { right: 19.5%; }
+
+        .table.table-vertical { left: 5%; }
+        
+        .table.motion-desk { top: 212px; left: 0%; }
+
+        .table.door { top: 460px; left: 0%; }
+
+        .table.water { right: 50.8%; }
+        .table.coffee { right: 55.8%; }
+        .table.fridge { left: 45%; }
+        .table.microwave { left: 33.3%; }
+
+        .table.airconditioner:nth-of-type(1) { top: 200px; left: 12.25%; }
+
+        /* Add a minimum width to prevent layout breaking on very small screens */
+        @media (max-width: 1200px) {
+            .container {
+                min-width: 1000px;
+                overflow-x: auto;
+            }
+        }
+
+        .copy-button {
+            margin-top: 0;
+            padding: 8px 16px;
+            font-size: 15px;
+            background-color: #63a4d9;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .copy-button:hover {
+            background-color: #1976D2;
+        }
+
+        .warning-message {
+            color: #D32F2F;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;  /* Hidden by default */
+        }
+
+        .default-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 20px;
+            background-color: #4CAF50;  /* Green color to differentiate from reset button */
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .default-button:hover {
+            background-color: #45a049;
+        }
+
+        .random-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 20px;
+            background-color: #9C27B0;  /* Purple color to differentiate */
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .random-button:hover {
+            background-color: #7B1FA2;
+        }
+
+        .input-container {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+        }
+
+        .input-group {
+            margin-bottom: 10px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .input-group input {
+            padding: 8px;
+            width: 200px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .input-group input:focus {
+            border-color: #2196F3;
+            outline: none;
+        }
+
+        .error-message {
+            color: #D32F2F;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .complete-random-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 20px;
+            background-color: #FF9800;  /* Orange color to differentiate */
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .complete-random-button:hover {
+            background-color: #F57C00;
+        }
+
+        .button-instructions {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+        }
+
+        .instruction {
+            margin: 8px 0;
+            font-size: 16px;
+            color: #666;
+        }
+
+        .instruction-title {
+            font-weight: bold;
+            color: #333;
+        }
+        .lets-go-button {
+            margin: 20px auto;
+            padding: 15px 30px;
+            font-size: 24px;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: block;
+            border-radius: 5px;
+        }
+
+        .lets-go-button:hover {
+            background-color: #1976D2;
+        }
+
+        .results-container {
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+            display: none;  /* Hidden by default */
+        }
+
+        .raffle-order, .seat-assignments {
+            margin: 10px 0;
+        }
+
+        .seat {
+            font-size: 12px;  /* Smaller font size to fit names */
+            padding: 2px;
+            word-wrap: break-word;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Lab Seat Assignment</h1>
+        
+        <button class="lets-go-button" onclick="runAssignment()">LET'S GO</button>
+
+        <div class="results-container" id="resultsContainer">
+            <h2>Raffle Order</h2>
+            <div class="raffle-order" id="raffleOrder"></div>
+        </div>
+
+        <div class="lab-layout">
+            <!-- Keep all the table, door, and other layout elements -->
+            <!-- ... existing layout code ... -->
+
+            <div class="lab-map" id="labMap"></div>
+        </div>
+    </div>
+
+    <script>
+        function createLabMap() {
+            const labMap = document.getElementById('labMap');
+            let seatCount = 1;
+            
+            // Similar to original createLabMap but seats are not clickable
+            for (let row = 0; row < 3; row++) {
+                for (let col = 0; col < 8; col++) {
+                    const seatDiv = document.createElement('div');
+                    seatDiv.className = 'seat';
+                    seatDiv.textContent = seatCount++;
+                    seatDiv.id = `seat-${seatDiv.textContent}`;
+                    labMap.appendChild(seatDiv);
+                }
+                
+                const gap = document.createElement('div');
+                gap.className = 'empty-space';
+                labMap.appendChild(gap);
+                
+                for (let col = 8; col < 16; col++) {
+                    const seatDiv = document.createElement('div');
+                    seatDiv.className = 'seat';
+                    seatDiv.textContent = seatCount++;
+                    seatDiv.id = `seat-${seatDiv.textContent}`;
+                    labMap.appendChild(seatDiv);
+                }
+            }
+            
+            for (let i = 0; i < 16; i++) {
+                const emptySpace = document.createElement('div');
+                emptySpace.className = 'empty-space';
+                labMap.appendChild(emptySpace);
+            }
+            
+            const lastSeat = document.createElement('div');
+            lastSeat.className = 'seat';
+            lastSeat.textContent = seatCount;
+            lastSeat.id = `seat-${seatCount}`;
+            labMap.appendChild(lastSeat);
+        }
+
+        async function runAssignment() {
+            try {
+                const response = await fetch('/run-assignment', {
+                    method: 'POST'
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+
+                const data = await response.json();
+                
+                // Display raffle order
+                const raffleOrder = document.getElementById('raffleOrder');
+                raffleOrder.innerHTML = data.raffleOrder.map(entry => 
+                    `<div>${entry}</div>`
+                ).join('');
+
+                // Update seat map with assignments
+                Object.entries(data.seatAssignments).forEach(([name, seatNumber]) => {
+                    const seatElement = document.getElementById(`seat-${seatNumber}`);
+                    if (seatElement) {
+                        seatElement.textContent = name;
+                    }
+                });
+
+                // Show results container
+                document.getElementById('resultsContainer').style.display = 'block';
+
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to run assignment');
+            }
+        }
+
+        // Initialize the lab map when the page loads
+        window.onload = createLabMap;
+    </script>
+</body>
+</html> 
