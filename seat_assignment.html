@@ -649,10 +649,7 @@
             // Assign seats based on preference order
             rankings.forEach(([student]) => {
                 const studentPref = studentPreferences.find(p => p.name === student);
-                if (!studentPref) {
-                    // Skip students without preferences
-                    return;
-                }
+                if (!studentPref) return;
                 
                 // Find first available preferred seat
                 const currentSeat = studentPref.currentSeat;
