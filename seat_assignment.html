@@ -571,6 +571,87 @@
             }
         }
 
+        function generateMoveChains(assignments) {
+            // Create a map of new seat -> student
+            const seatToStudent = {};
+            for (const [student, seat] of Object.entries(assignments)) {
+                seatToStudent[seat] = student;
+            }
+
+            // Create a map of student -> current seat
+            const studentToCurrentSeat = {};
+            studentPreferences.forEach(pref => {
+                studentToCurrentSeat[pref.name] = pref.currentSeat;
+            });
+
+            const chains = [];
+            const usedStudents = new Set();
+
+            // Find chains
+            for (const [startStudent, newSeat] of Object.entries(assignments)) {
+                if (usedStudents.has(startStudent)) continue;
+
+                const chain = [];
+                let currentStudent = startStudent;
+                let currentSeat = studentToCurrentSeat[currentStudent];
+
+                while (true) {
+                    // Add current student to chain
+                    chain.push({
+                        student: currentStudent,
+                        currentSeat: currentSeat
+                    });
+                    usedStudents.add(currentStudent);
+
+                    // Find who gets current student's seat
+                    const nextStudent = seatToStudent[currentSeat];
+                    
+                    // If no one gets this seat or we've completed the cycle
+                    if (!nextStudent || nextStudent === startStudent) {
+                        if (chain.length > 1) {  // Only add chains with 2 or more students
+                            chains.push(chain);
+                        }
+                        break;
+                    }
+
+                    // Move to next student
+                    currentStudent = nextStudent;
+                    currentSeat = studentToCurrentSeat[currentStudent];
+                }
+            }
+
+            return chains;
+        }
+
+        function displayMoveChains(chains) {
+            const resultsContainer = document.getElementById('resultsContainer');
+            
+            // Create move chains section
+            const chainsSection = document.createElement('div');
+            chainsSection.innerHTML = '<h2>Move Chains</h2>';
+            
+            if (chains.length === 0) {
+                chainsSection.innerHTML += '<p>No move chains found.</p>';
+            } else {
+                chains.forEach((chain, index) => {
+                    const chainDiv = document.createElement('div');
+                    chainDiv.style.marginBottom = '10px';
+                    
+                    const chainText = chain.map((node, i) => {
+                        const arrow = i < chain.length - 1 ? ' → ' : 
+                            ` → ${chain[0].student} (${chain[0].currentSeat})`; // Complete the cycle
+                        return `${node.student} (${node.currentSeat})${arrow}`;
+                    }).join('');
+                    
+                    chainDiv.textContent = `Chain ${index + 1}: ${chainText}`;
+                    chainsSection.appendChild(chainDiv);
+                });
+            }
+            
+            // Add the chains section after the raffle order
+            resultsContainer.appendChild(chainsSection);
+        }
+
         function runSeatAssignment() {
             if (!preferencesLoaded || !studentPreferences) {
                 alert('Please wait for student preferences to load. If this persists, try refreshing the page.');
@@ -641,6 +722,10 @@
                     seatElement.textContent = student;
                 }
             }
+
+            // Generate and display move chains
+            const moveChains = generateMoveChains(assignments);
+            displayMoveChains(moveChains);
         }
 
         function assignSeats(rankings) {
