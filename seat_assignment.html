@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lab Seat Preference Selector</title>
+    <title>Lab Seat Assignment</title>
     <style>
         .container {
             max-width: 1200px;
@@ -34,7 +34,6 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            font-size: 15px;
             background-color: white;
             position: relative;
             z-index: 2;
@@ -387,6 +386,11 @@
             background-color: #1976D2;
         }
 
+        .lets-go-button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
         .results-container {
             margin: 20px 0;
             padding: 20px;
@@ -399,18 +403,12 @@
             margin: 10px 0;
         }
 
-        .seat {
-            font-size: 12px;  /* Smaller font size to fit names */
-            padding: 2px;
-            word-wrap: break-word;
-            text-align: center;
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Lab Seat Assignment</h1>
-        <button class="assignment-button" onclick="window.location.href='index.html'">Go back to Seat Preference</button>
+        <button class="assignment-button" onclick="window.location.href='index.html'">Go back to Seat Preference Selector Page</button>
         
         <button class="lets-go-button" onclick="runSeatAssignment()">LET'S GO</button>
 
@@ -470,9 +468,16 @@
         let studentPreferences = null;
         let priorityStudents = null;
         
-        // Function to load and parse the CSV data
+        // Add these variables at the top with other global variables
+        let preferencesLoaded = false;
+        const letsGoButton = document.querySelector('.lets-go-button');
+        
         async function loadPreferences() {
             try {
+                // Disable the button while loading
+                letsGoButton.disabled = true;
+                letsGoButton.textContent = 'Loading...';
+
                 const response = await fetch('cvlab_seat_preference.csv');
                 const data = await response.text();
                 const rows = data.trim().split('\n');
@@ -494,14 +499,21 @@
                 priorityStudents = students
                     .filter(name => name.endsWith('*'))
                     .map(name => name.replace('*', ''));
+
+                // Mark as loaded and enable button
+                preferencesLoaded = true;
+                letsGoButton.disabled = false;
+                letsGoButton.textContent = "LET'S GO";
             } catch (error) {
                 console.error('Error loading preferences:', error);
+                letsGoButton.textContent = 'Error Loading Data';
+                alert('Failed to load student preferences. Please check if the data files exist and try refreshing the page.');
             }
         }
 
         function runSeatAssignment() {
-            if (!studentPreferences) {
-                alert('Error: Student preferences not loaded');
+            if (!preferencesLoaded || !studentPreferences) {
+                alert('Please wait for student preferences to load. If this persists, try refreshing the page.');
                 return;
             }
 
