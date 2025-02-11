@@ -608,9 +608,21 @@
                     const nextStudent = Object.keys(studentToCurrentSeat)
                         .find(student => studentToCurrentSeat[student] === newAssignedSeat);
                     
-                    // If no one currently sits in this seat or we've completed the cycle
-                    if (!nextStudent || nextStudent === startStudent) {
-                        if (chain.length > 1) {  // Only add chains with 2 or more students
+                    // If no one currently sits in this seat, end with seat number
+                    if (!nextStudent) {
+                        chain.push({
+                            student: newAssignedSeat.toString(),
+                            currentSeat: null
+                        });
+                        if (chain.length > 1) {
+                            chains.push(chain);
+                        }
+                        break;
+                    }
+                    
+                    // If we've completed the cycle back to start
+                    if (nextStudent === startStudent) {
+                        if (chain.length > 1) {
                             chains.push(chain);
                         }
                         break;
