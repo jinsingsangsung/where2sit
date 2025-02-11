@@ -386,11 +386,6 @@
             background-color: #1976D2;
         }
 
-        .lets-go-button:disabled {
-            background-color: #cccccc;
-            cursor: not-allowed;
-        }
-
         .results-container {
             margin: 20px 0;
             padding: 20px;
@@ -403,12 +398,25 @@
             margin: 10px 0;
         }
 
+        .success-message {
+            color: #4CAF50;
+            background-color: #E8F5E9;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            display: none;  /* Hidden by default */
+            text-align: center;
+            font-weight: bold;
+        }
+
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Lab Seat Assignment</h1>
         <button class="assignment-button" onclick="window.location.href='index.html'">Go back to Seat Preference Selector Page</button>
+        
+        <div id="successMessage" class="success-message"></div>
         
         <button class="lets-go-button" onclick="runSeatAssignment()">LET'S GO</button>
 
@@ -504,6 +512,17 @@
                 preferencesLoaded = true;
                 letsGoButton.disabled = false;
                 letsGoButton.textContent = "LET'S GO";
+
+                // Show success message
+                const successMessage = document.getElementById('successMessage');
+                successMessage.textContent = 'Preference list and students files successfully loaded!';
+                successMessage.style.display = 'block';
+                
+                // Optionally hide the message after 3 seconds
+                setTimeout(() => {
+                    successMessage.style.display = 'none';
+                }, 3000);
+
             } catch (error) {
                 console.error('Error loading preferences:', error);
                 letsGoButton.textContent = 'Error Loading Data';
