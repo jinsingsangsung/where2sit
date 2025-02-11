@@ -239,6 +239,19 @@
                 overflow-x: auto;
             }
         }
+        .assignment-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 20px;
+            background-color: #2196F3;  /* Blue color to differentiate */
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .assignment-button:hover {
+            background-color: #1976D2;
+        }
 
         .copy-button {
             margin-top: 0;
@@ -366,7 +379,7 @@
             color: white;
             border: none;
             cursor: pointer;
-}
+        }
 
         .assignment-button:hover {
             background-color: #1976D2;
@@ -375,7 +388,10 @@
 </head>
 <body>
     <div class="container">
-        <h1>Lab Seat Preference Selector</h1>
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <h1>Lab Seat Preference Selector</h1>
+            <button class="assignment-button" onclick="window.location.href='seat_assignment.html'">Go to Seat Assignment</button>
+        </div>
         <p>Click on seats in order of preference. Selected seats will turn green.</p>
         
         <div class="input-container">
@@ -448,7 +464,6 @@
             <button class="default-button" onclick="chooseDefault()">Choose Default</button>
             <button class="random-button" onclick="chooseRandom()">Random Order</button>
             <button class="complete-random-button" onclick="completeRandom()">Complete Random</button>
-            <button class="random-button" onclick="window.location.href='seat_assignment.html'">Go to Seat Assignment</button>
         </div>
 
         <div class="button-instructions">

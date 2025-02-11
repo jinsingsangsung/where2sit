@@ -397,7 +397,7 @@
     <div class="container">
         <h1>Lab Seat Assignment</h1>
         
-        <button class="lets-go-button" onclick="runAssignment()">LET'S GO</button>
+        <button class="lets-go-button" onclick="runSeatAssignment()">LET'S GO</button>
 
         <div class="results-container" id="resultsContainer">
             <h2>Raffle Order</h2>
@@ -413,6 +413,124 @@
     </div>
 
     <script>
+        const totalSeats = 49;
+        let studentPreferences = null;
+        let priorityStudents = null;
+        
+        // Function to load and parse the CSV data
+        async function loadPreferences() {
+            try {
+                const response = await fetch('cvlab_seat_preference.csv');
+                const data = await response.text();
+                const rows = data.trim().split('\n');
+                
+                // Parse CSV into structured data
+                studentPreferences = rows.map(row => {
+                    const [name, currentSeat, ...preferences] = row.replace(/"/g, '').split(',');
+                    return {
+                        name,
+                        currentSeat: parseInt(currentSeat),
+                        preferences: preferences.map(p => parseInt(p))
+                    };
+                });
+
+                // Load priority students
+                const priorityResponse = await fetch('students.txt');
+                const priorityData = await priorityResponse.text();
+                const students = priorityData.trim().split('\n').filter(s => s);
+                priorityStudents = students
+                    .filter(name => name.endsWith('*'))
+                    .map(name => name.replace('*', ''));
+            } catch (error) {
+                console.error('Error loading preferences:', error);
+            }
+        }
+
+        function runSeatAssignment() {
+            if (!studentPreferences) {
+                alert('Error: Student preferences not loaded');
+                return;
+            }
+
+            const PRIORITY_NUM = 20; // Same as default in Python script
+            
+            // Get all student names
+            const allStudents = studentPreferences.map(s => s.name);
+            
+            // Separate priority and non-priority students
+            const nonPriorityStudents = allStudents.filter(s => !priorityStudents.includes(s));
+            
+            // Generate random order (similar to Python script's sorting function)
+            const priorityList = Array.from({length: PRIORITY_NUM}, (_, i) => i);
+            shuffleArray(priorityList);
+            
+            const nonPriorityList = Array.from(
+                {length: allStudents.length - priorityList.length}, 
+                (_, i) => i + priorityList.length
+            );
+            shuffleArray(nonPriorityList);
+            
+            // Create ranking list
+            const rankings = [];
+            priorityStudents.forEach((student, i) => {
+                rankings.push([student, priorityList[i]]);
+            });
+            nonPriorityStudents.forEach((student, i) => {
+                rankings.push([student, nonPriorityList[i]]);
+            });
+            
+            // Sort by rank number
+            rankings.sort((a, b) => a[1] - b[1]);
+            
+            // Display raffle order
+            const raffleOrderDisplay = document.getElementById('raffleOrderDisplay');
+            raffleOrderDisplay.style.display = 'block';
+            raffleOrderDisplay.textContent = "Raffle Order:\n" + 
+                rankings.map((r, i) => `${r[0]} - Rank ${i + 1}`).join("\n");
+            
+            // Assign seats
+            const assignments = assignSeats(rankings);
+            
+            // Update seat display
+            for (const [student, seatNum] of Object.entries(assignments)) {
+                const seatElement = document.getElementById('seat-' + seatNum);
+                if (seatElement) {
+                    seatElement.textContent = student;
+                }
+            }
+        }
+
+        function assignSeats(rankings) {
+            const assignments = {};
+            const takenSeats = new Set();
+            
+            // Assign seats based on preference order
+            rankings.forEach(([student]) => {
+                const studentPref = studentPreferences.find(p => p.name === student);
+                if (!studentPref) return;
+                
+                // Find first available preferred seat
+                const currentSeat = studentPref.currentSeat;
+                for (const prefSeat of studentPref.preferences) {
+                    if (!takenSeats.has(prefSeat) && prefSeat !== currentSeat) {
+                        assignments[student] = prefSeat;
+                        takenSeats.add(prefSeat);
+                        break;
+                    }
+                }
+            });
+            
+            return assignments;
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
         function createLabMap() {
             const labMap = document.getElementById('labMap');
             let seatCount = 1;
@@ -453,43 +571,11 @@
             labMap.appendChild(lastSeat);
         }
 
-        async function runAssignment() {
-            try {
-                const response = await fetch('/run-assignment', {
-                    method: 'POST'
-                });
-                
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-
-                const data = await response.json();
-                
-                // Display raffle order
-                const raffleOrder = document.getElementById('raffleOrder');
-                raffleOrder.innerHTML = data.raffleOrder.map(entry => 
-                    `<div>${entry}</div>`
-                ).join('');
-
-                // Update seat map with assignments
-                Object.entries(data.seatAssignments).forEach(([name, seatNumber]) => {
-                    const seatElement = document.getElementById(`seat-${seatNumber}`);
-                    if (seatElement) {
-                        seatElement.textContent = name;
-                    }
-                });
-
-                // Show results container
-                document.getElementById('resultsContainer').style.display = 'block';
-
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Failed to run assignment');
-            }
-        }
-
-        // Initialize the lab map when the page loads
-        window.onload = createLabMap;
+        // Initialize
+        window.onload = async () => {
+            createLabMap();
+            await loadPreferences();
+        };
     </script>
 </body>
 </html> 
