@@ -521,7 +521,7 @@
                 // Optionally hide the message after 3 seconds
                 setTimeout(() => {
                     successMessage.style.display = 'none';
-                }, 3000);
+                }, 1500);
 
             } catch (error) {
                 console.error('Error loading preferences:', error);
@@ -567,10 +567,14 @@
             rankings.sort((a, b) => a[1] - b[1]);
             
             // Display raffle order
-            const raffleOrderDisplay = document.getElementById('raffleOrderDisplay');
-            raffleOrderDisplay.style.display = 'block';
-            raffleOrderDisplay.textContent = "Raffle Order:\n" + 
-                rankings.map((r, i) => `${r[0]} - Rank ${i + 1}`).join("\n");
+            const resultsContainer = document.getElementById('resultsContainer');
+            const raffleOrder = document.getElementById('raffleOrder');
+            
+            // Show the results container
+            resultsContainer.style.display = 'block';
+            
+            // Update the raffle order text
+            raffleOrder.innerHTML = rankings.map((r, i) => `${r[0]} - Rank ${i + 1}`).join("<br>");
             
             // Assign seats
             const assignments = assignSeats(rankings);
