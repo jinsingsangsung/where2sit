@@ -239,6 +239,19 @@
                 overflow-x: auto;
             }
         }
+        .assignment-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 20px;
+            background-color: #2196F3;  /* Blue color to differentiate */
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .assignment-button:hover {
+            background-color: #1976D2;
+        }
 
         .copy-button {
             margin-top: 0;
@@ -396,6 +409,7 @@
 <body>
     <div class="container">
         <h1>Lab Seat Assignment</h1>
+        <button class="assignment-button" onclick="window.location.href='index.html'">Go back to Seat Preference</button>
         
         <button class="lets-go-button" onclick="runSeatAssignment()">LET'S GO</button>
 
