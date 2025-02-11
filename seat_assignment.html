@@ -394,8 +394,16 @@
             display: none;  /* Hidden by default */
         }
 
-        .raffle-order, .seat-assignments {
+        .priority-students, .raffle-order, .seat-assignments {
             margin: 10px 0;
+        }
+
+        .priority-box {
+            border: 2px solid #2196F3;
+            padding: 15px;
+            border-radius: 4px;
+            background-color: #E3F2FD;
+            margin-bottom: 20px;
         }
 
         .success-message {
@@ -421,6 +429,10 @@
         <button class="lets-go-button" onclick="runSeatAssignment()">LET'S GO</button>
 
         <div class="results-container" id="resultsContainer">
+            <div class="priority-box">
+                <h2>Priority Students</h2>
+                <div class="priority-students" id="priorityStudents"></div>
+            </div>
             <h2>Raffle Order</h2>
             <div class="raffle-order" id="raffleOrder"></div>
         </div>
@@ -573,27 +585,32 @@
             // Separate priority and non-priority students
             const nonPriorityStudents = allStudents.filter(s => !priorityStudents.includes(s));
             
-            // Generate random order (similar to Python script's sorting function)
-            const priorityList = Array.from({length: PRIORITY_NUM}, (_, i) => i);
-            shuffleArray(priorityList);
-            
-            const nonPriorityList = Array.from(
-                {length: allStudents.length - priorityList.length}, 
-                (_, i) => i + priorityList.length
-            );
-            shuffleArray(nonPriorityList);
+            // Generate all possible ranks
+            const allRanks = Array.from({length: allStudents.length}, (_, i) => i);
+            shuffleArray(allRanks);
             
             // Create ranking list
             const rankings = [];
+            
+            // First, assign ranks to priority students ensuring they get ranks 0-19
+            const priorityRanks = allRanks.slice(0, PRIORITY_NUM);
             priorityStudents.forEach((student, i) => {
-                rankings.push([student, priorityList[i]]);
-            });
-            nonPriorityStudents.forEach((student, i) => {
-                rankings.push([student, nonPriorityList[i]]);
+                rankings.push([student, priorityRanks[i]]);
             });
             
-            // Sort by rank number
-            rankings.sort((a, b) => a[1] - b[1]);
+            // Remove used ranks and shuffle remaining ranks for non-priority students
+            const usedRanks = new Set(rankings.map(r => r[1]));
+            const remainingRanks = allRanks.filter(rank => !usedRanks.has(rank));
+            shuffleArray(remainingRanks);
+            
+            // Assign remaining ranks to non-priority students
+            nonPriorityStudents.forEach((student, i) => {
+                rankings.push([student, remainingRanks[i]]);
+            });
+            
+            // Display priority students
+            const priorityStudentsDiv = document.getElementById('priorityStudents');
+            priorityStudentsDiv.innerHTML = priorityStudents.join("<br>");
             
             // Display raffle order
             const resultsContainer = document.getElementById('resultsContainer');
