@@ -576,7 +576,7 @@
                 return;
             }
 
-            // Clear all previous seat assignments first
+            // Clear all previous seat assignments
             for (let i = 1; i <= totalSeats; i++) {
                 const seatElement = document.getElementById('seat-' + i);
                 if (seatElement) {
@@ -593,23 +593,26 @@
             // Create new ranking list
             const rankings = [];
             
-            // Generate all possible ranks
-            const allRanks = Array.from({length: allStudents.length}, (_, i) => i);
-            shuffleArray(allRanks);
+            // First, create and shuffle ranks 0-19 for priority pool
+            const priorityPool = Array.from({length: PRIORITY_NUM}, (_, i) => i);
+            shuffleArray(priorityPool);
             
-            // Take first PRIORITY_NUM ranks for priority students
-            const priorityRanks = allRanks.slice(0, priorityStudents.length);
-            shuffleArray(priorityRanks);
+            // Take only as many ranks as we have priority students
+            const priorityRanks = priorityPool.slice(0, priorityStudents.length);
+            
+            // Combine remaining priority pool ranks with ranks 20+ for non-priority students
+            const remainingPriorityPool = priorityPool.slice(priorityStudents.length);
+            const higherRanks = Array.from(
+                {length: allStudents.length - PRIORITY_NUM}, 
+                (_, i) => i + PRIORITY_NUM
+            );
+            const nonPriorityPool = [...remainingPriorityPool, ...higherRanks];
+            shuffleArray(nonPriorityPool);
             
             // Assign priority students to their ranks
             priorityStudents.forEach((student, i) => {
                 rankings.push([student, priorityRanks[i]]);
             });
-            
-            // Get all unused ranks (including remaining spots in top 20)
-            const usedRanks = new Set(rankings.map(r => r[1]));
-            const remainingRanks = allRanks.filter(rank => !usedRanks.has(rank));
-            shuffleArray(remainingRanks);
             
             // Shuffle non-priority students
             const shuffledNonPriority = [...nonPriorityStudents];
@@ -617,7 +620,7 @@
             
             // Assign remaining ranks to non-priority students
             shuffledNonPriority.forEach((student, i) => {
-                rankings.push([student, remainingRanks[i]]);
+                rankings.push([student, nonPriorityPool[i]]);
             });
             
             // Update the raffle order text
