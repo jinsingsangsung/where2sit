@@ -486,27 +486,49 @@
                 letsGoButton.disabled = true;
                 letsGoButton.textContent = 'Loading...';
 
+                // Load priority students first
+                const priorityResponse = await fetch('students.txt');
+                const priorityData = await priorityResponse.text();
+                const students = priorityData.trim().split('\n').filter(s => s);
+                
+                // Create a set of all valid students (both with and without asterisk)
+                const validStudents = new Set(students.map(s => s.replace('*', '')));
+                
+                // Filter out priority students
+                priorityStudents = students
+                    .filter(name => name.endsWith('*'))
+                    .map(name => name.replace('*', ''));
+
+                // Load and validate preferences
                 const response = await fetch('cvlab_seat_preference.csv');
                 const data = await response.text();
                 const rows = data.trim().split('\n');
                 
-                // Parse CSV into structured data
-                studentPreferences = rows.map(row => {
-                    const [name, currentSeat, ...preferences] = row.replace(/"/g, '').split(',');
-                    return {
-                        name,
-                        currentSeat: parseInt(currentSeat),
-                        preferences: preferences.map(p => parseInt(p))
-                    };
-                });
+                // Track removed students
+                const removedStudents = [];
+                
+                // Parse CSV into structured data with validation
+                studentPreferences = rows
+                    .map(row => {
+                        const [name, currentSeat, ...preferences] = row.replace(/"/g, '').split(',');
+                        return {
+                            name,
+                            currentSeat: parseInt(currentSeat),
+                            preferences: preferences.map(p => parseInt(p))
+                        };
+                    })
+                    .filter(student => {
+                        if (!validStudents.has(student.name)) {
+                            removedStudents.push(student.name);
+                            return false;
+                        }
+                        return true;
+                    });
 
-                // Load priority students
-                const priorityResponse = await fetch('students.txt');
-                const priorityData = await priorityResponse.text();
-                const students = priorityData.trim().split('\n').filter(s => s);
-                priorityStudents = students
-                    .filter(name => name.endsWith('*'))
-                    .map(name => name.replace('*', ''));
+                // Show warning for removed students
+                if (removedStudents.length > 0) {
+                    alert(`The following students were not found in students.txt and have been removed:\n${removedStudents.join(', ')}`);
+                }
 
                 // Mark as loaded and enable button
                 preferencesLoaded = true;
@@ -518,10 +540,9 @@
                 successMessage.textContent = 'Preference list and students files successfully loaded!';
                 successMessage.style.display = 'block';
                 
-                // Optionally hide the message after 3 seconds
                 setTimeout(() => {
                     successMessage.style.display = 'none';
-                }, 1500);
+                }, 3000);
 
             } catch (error) {
                 console.error('Error loading preferences:', error);
@@ -536,7 +557,15 @@
                 return;
             }
 
-            const PRIORITY_NUM = 20; // Same as default in Python script
+            // Clear all previous seat assignments first
+            for (let i = 1; i <= totalSeats; i++) {
+                const seatElement = document.getElementById('seat-' + i);
+                if (seatElement) {
+                    seatElement.textContent = i;  // Reset to just showing seat number
+                }
+            }
+
+            const PRIORITY_NUM = 20;
             
             // Get all student names
             const allStudents = studentPreferences.map(s => s.name);
