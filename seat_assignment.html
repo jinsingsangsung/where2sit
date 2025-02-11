@@ -594,6 +594,7 @@
                 const chain = [];
                 let currentStudent = startStudent;
                 let currentSeat = studentToCurrentSeat[currentStudent];
+                let newAssignedSeat = assignments[currentStudent];
 
                 while (true) {
                     // Add current student to chain
@@ -603,10 +604,11 @@
                     });
                     usedStudents.add(currentStudent);
 
-                    // Find who gets current student's seat
-                    const nextStudent = seatToStudent[currentSeat];
+                    // Find who currently sits in the new assigned seat
+                    const nextStudent = Object.keys(studentToCurrentSeat)
+                        .find(student => studentToCurrentSeat[student] === newAssignedSeat);
                     
-                    // If no one gets this seat or we've completed the cycle
+                    // If no one currently sits in this seat or we've completed the cycle
                     if (!nextStudent || nextStudent === startStudent) {
                         if (chain.length > 1) {  // Only add chains with 2 or more students
                             chains.push(chain);
@@ -617,6 +619,7 @@
                     // Move to next student
                     currentStudent = nextStudent;
                     currentSeat = studentToCurrentSeat[currentStudent];
+                    newAssignedSeat = assignments[currentStudent];
                 }
             }
 
