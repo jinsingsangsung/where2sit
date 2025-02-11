@@ -547,6 +547,11 @@
                 letsGoButton.disabled = false;
                 letsGoButton.textContent = "LET'S GO";
 
+                // Show priority students immediately after loading
+                const priorityStudentsDiv = document.getElementById('priorityStudents');
+                priorityStudentsDiv.innerHTML = priorityStudents.join("<br>");
+                document.getElementById('resultsContainer').style.display = 'block';
+
                 // Show success message
                 const successMessage = document.getElementById('successMessage');
                 successMessage.textContent = 'Preference list and students files successfully loaded!';
@@ -579,21 +584,20 @@
 
             const PRIORITY_NUM = 20;
             
-            // Get all student names
+            // Get all student names (do this every time to ensure fresh lists)
             const allStudents = studentPreferences.map(s => s.name);
-            
-            // Separate priority and non-priority students
             const nonPriorityStudents = allStudents.filter(s => !priorityStudents.includes(s));
             
-            // Generate all possible ranks
+            // Generate fresh ranks each time
             const allRanks = Array.from({length: allStudents.length}, (_, i) => i);
             shuffleArray(allRanks);
             
-            // Create ranking list
+            // Create new ranking list
             const rankings = [];
             
-            // First, assign ranks to priority students ensuring they get ranks 0-19
+            // Assign ranks to priority students
             const priorityRanks = allRanks.slice(0, PRIORITY_NUM);
+            shuffleArray(priorityRanks); // Shuffle priority ranks
             priorityStudents.forEach((student, i) => {
                 rankings.push([student, priorityRanks[i]]);
             });
@@ -603,24 +607,21 @@
             const remainingRanks = allRanks.filter(rank => !usedRanks.has(rank));
             shuffleArray(remainingRanks);
             
+            // Shuffle non-priority students order each time
+            const shuffledNonPriority = [...nonPriorityStudents];
+            shuffleArray(shuffledNonPriority);
+            
             // Assign remaining ranks to non-priority students
-            nonPriorityStudents.forEach((student, i) => {
+            shuffledNonPriority.forEach((student, i) => {
                 rankings.push([student, remainingRanks[i]]);
             });
             
-            // Display priority students
-            const priorityStudentsDiv = document.getElementById('priorityStudents');
-            priorityStudentsDiv.innerHTML = priorityStudents.join("<br>");
-            
-            // Display raffle order
-            const resultsContainer = document.getElementById('resultsContainer');
-            const raffleOrder = document.getElementById('raffleOrder');
-            
-            // Show the results container
-            resultsContainer.style.display = 'block';
-            
             // Update the raffle order text
-            raffleOrder.innerHTML = rankings.map((r, i) => `${r[0]} - Rank ${i + 1}`).join("<br>");
+            const raffleOrder = document.getElementById('raffleOrder');
+            raffleOrder.innerHTML = rankings
+                .sort((a, b) => a[1] - b[1])
+                .map((r, i) => `${r[0]} - Rank ${i + 1}`)
+                .join("<br>");
             
             // Assign seats
             const assignments = assignSeats(rankings);
