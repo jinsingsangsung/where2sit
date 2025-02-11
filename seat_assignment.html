@@ -570,7 +570,7 @@
             }
         }
 
-        function runSeatAssignment() {
+        async function runSeatAssignment() {
             if (!preferencesLoaded || !studentPreferences) {
                 alert('Please wait for student preferences to load. If this persists, try refreshing the page.');
                 return;
@@ -586,9 +586,9 @@
 
             const PRIORITY_NUM = 20;
             
-            // Get all student names
-            const allStudents = studentPreferences.map(s => s.name);
-            const nonPriorityStudents = allStudents.filter(s => !priorityStudents.includes(s));
+            // Use all students from students.txt instead of preferences file
+            const allStudents = Array.from(validStudents);
+            const nonPriorityStudents = Array.from(allStudents).filter(s => !priorityStudents.includes(s));
             
             // Create new ranking list
             const rankings = [];
@@ -649,7 +649,10 @@
             // Assign seats based on preference order
             rankings.forEach(([student]) => {
                 const studentPref = studentPreferences.find(p => p.name === student);
-                if (!studentPref) return;
+                if (!studentPref) {
+                    // Skip students without preferences
+                    return;
+                }
                 
                 // Find first available preferred seat
                 const currentSeat = studentPref.currentSeat;
