@@ -615,7 +615,7 @@
                             currentSeat: null
                         });
                         if (chain.length > 1) {
-                            chains.push(chain);
+                            mergeOrAddChain(chains, chain);
                         }
                         break;
                     }
@@ -623,7 +623,7 @@
                     // If we've completed the cycle back to start
                     if (nextStudent === startStudent) {
                         if (chain.length > 1) {
-                            chains.push(chain);
+                            mergeOrAddChain(chains, chain);
                         }
                         break;
                     }
@@ -633,6 +633,67 @@
                     currentSeat = studentToCurrentSeat[currentStudent];
                     newAssignedSeat = assignments[currentStudent];
                 }
+            }
+
+            function mergeOrAddChain(chains, newChain) {
+                // Convert chain to set of students for easier comparison
+                const newChainStudents = new Set(
+                    newChain.map(node => node.student)
+                        .filter(student => !isNumeric(student)) // Exclude seat numbers
+                );
+
+                // Find any existing chain that shares students with the new chain
+                const overlappingChainIndex = chains.findIndex(existingChain => {
+                    const existingStudents = new Set(
+                        existingChain.map(node => node.student)
+                            .filter(student => !isNumeric(student))
+                    );
+                    return [...newChainStudents].some(student => existingStudents.has(student));
+                });
+
+                if (overlappingChainIndex === -1) {
+                    // No overlap found, add as new chain
+                    chains.push(newChain);
+                } else {
+                    // Merge with existing chain
+                    const existingChain = chains[overlappingChainIndex];
+                    const mergedStudents = new Set([
+                        ...existingChain.map(node => node.student),
+                        ...newChain.map(node => node.student)
+                    ]);
+                    
+                    // Create a new merged chain maintaining move order
+                    const mergedChain = [];
+                    let currentStudent = existingChain[0].student;
+                    const allMoves = new Map();
+                    
+                    // Build map of all moves
+                    [...existingChain, ...newChain].forEach((node, i, arr) => {
+                        if (i < arr.length - 1 && !isNumeric(arr[i + 1].student)) {
+                            allMoves.set(node.student, arr[i + 1]);
+                        }
+                    });
+
+                    // Build merged chain
+                    while (mergedChain.length < mergedStudents.size) {
+                        const currentNode = {
+                            student: currentStudent,
+                            currentSeat: studentToCurrentSeat[currentStudent]
+                        };
+                        mergedChain.push(currentNode);
+                        
+                        const nextNode = allMoves.get(currentStudent);
+                        if (!nextNode) break;
+                        currentStudent = nextNode.student;
+                    }
+
+                    // Replace existing chain with merged chain
+                    chains[overlappingChainIndex] = mergedChain;
+                }
+            }
+
+            function isNumeric(str) {
+                return !isNaN(str) && !isNaN(parseFloat(str));
             }
 
             return chains;
