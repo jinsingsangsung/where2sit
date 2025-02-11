@@ -489,6 +489,7 @@
         const totalSeats = 49;
         let studentPreferences = null;
         let priorityStudents = null;
+        let validStudents = null;  // Add this global variable
         
         // Add these variables at the top with other global variables
         let preferencesLoaded = false;
@@ -506,7 +507,7 @@
                 const students = priorityData.trim().split('\n').filter(s => s);
                 
                 // Create a set of all valid students (both with and without asterisk)
-                const validStudents = new Set(students.map(s => s.replace('*', '')));
+                validStudents = new Set(students.map(s => s.replace('*', '')));  // Now assigned to global variable
                 
                 // Filter out priority students
                 priorityStudents = students
