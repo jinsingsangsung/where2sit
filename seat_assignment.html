@@ -702,13 +702,13 @@
         function displayMoveChains(chains) {
             const resultsContainer = document.getElementById('resultsContainer');
             
-            // Remove existing move chains section if it exists
-            const existingChainsSections = resultsContainer.querySelectorAll('div');
-            existingChainsSections.forEach(section => {
-                if (section.querySelector('h2') && section.querySelector('h2').textContent === 'Move Chains') {
-                    section.remove();
-                }
-            });
+            // // Remove existing move chains section if it exists
+            // const existingChainsSections = resultsContainer.querySelectorAll('div');
+            // existingChainsSections.forEach(section => {
+            //     if (section.querySelector('h2') && section.querySelector('h2').textContent === 'Move Chains') {
+            //         section.remove();
+            //     }
+            // });
             
             // Create new move chains section
             const chainsSection = document.createElement('div');
