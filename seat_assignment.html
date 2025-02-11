@@ -429,10 +429,6 @@
         <button class="lets-go-button" onclick="runSeatAssignment()">LET'S GO</button>
 
         <div class="results-container" id="resultsContainer">
-            <div class="priority-box">
-                <h2>Priority Students</h2>
-                <div class="priority-students" id="priorityStudents"></div>
-            </div>
             <h2>Raffle Order</h2>
             <div class="raffle-order" id="raffleOrder"></div>
         </div>
@@ -480,6 +476,12 @@
 
             <div class="lab-map" id="labMap"></div>
 
+        </div>
+        <div class="results-container" id="resultsContainer"></div>
+            <div class="priority-box">
+                <h2>Priority Students</h2>
+                <div class="priority-students" id="priorityStudents"></div>
+            </div>
         </div>
     </div>
 
@@ -578,36 +580,38 @@
             for (let i = 1; i <= totalSeats; i++) {
                 const seatElement = document.getElementById('seat-' + i);
                 if (seatElement) {
-                    seatElement.textContent = i;  // Reset to just showing seat number
+                    seatElement.textContent = i;
                 }
             }
 
             const PRIORITY_NUM = 20;
             
-            // Get all student names (do this every time to ensure fresh lists)
+            // Get all student names
             const allStudents = studentPreferences.map(s => s.name);
             const nonPriorityStudents = allStudents.filter(s => !priorityStudents.includes(s));
-            
-            // Generate fresh ranks each time
-            const allRanks = Array.from({length: allStudents.length}, (_, i) => i);
-            shuffleArray(allRanks);
             
             // Create new ranking list
             const rankings = [];
             
-            // Assign ranks to priority students
-            const priorityRanks = allRanks.slice(0, PRIORITY_NUM);
-            shuffleArray(priorityRanks); // Shuffle priority ranks
+            // Generate all possible ranks
+            const allRanks = Array.from({length: allStudents.length}, (_, i) => i);
+            shuffleArray(allRanks);
+            
+            // Take first PRIORITY_NUM ranks for priority students
+            const priorityRanks = allRanks.slice(0, priorityStudents.length);
+            shuffleArray(priorityRanks);
+            
+            // Assign priority students to their ranks
             priorityStudents.forEach((student, i) => {
                 rankings.push([student, priorityRanks[i]]);
             });
             
-            // Remove used ranks and shuffle remaining ranks for non-priority students
+            // Get all unused ranks (including remaining spots in top 20)
             const usedRanks = new Set(rankings.map(r => r[1]));
             const remainingRanks = allRanks.filter(rank => !usedRanks.has(rank));
             shuffleArray(remainingRanks);
             
-            // Shuffle non-priority students order each time
+            // Shuffle non-priority students
             const shuffledNonPriority = [...nonPriorityStudents];
             shuffleArray(shuffledNonPriority);
             
