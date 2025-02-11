@@ -703,10 +703,12 @@
             const resultsContainer = document.getElementById('resultsContainer');
             
             // Remove existing move chains section if it exists
-            const existingChainsSection = resultsContainer.querySelector('div:has(h2:contains("Move Chains"))');
-            if (existingChainsSection) {
-                existingChainsSection.remove();
-            }
+            const existingChainsSections = resultsContainer.querySelectorAll('div');
+            existingChainsSections.forEach(section => {
+                if (section.querySelector('h2') && section.querySelector('h2').textContent === 'Move Chains') {
+                    section.remove();
+                }
+            });
             
             // Create new move chains section
             const chainsSection = document.createElement('div');
