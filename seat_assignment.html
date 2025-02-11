@@ -702,7 +702,13 @@
         function displayMoveChains(chains) {
             const resultsContainer = document.getElementById('resultsContainer');
             
-            // Create move chains section
+            // Remove existing move chains section if it exists
+            const existingChainsSection = resultsContainer.querySelector('div:has(h2:contains("Move Chains"))');
+            if (existingChainsSection) {
+                existingChainsSection.remove();
+            }
+            
+            // Create new move chains section
             const chainsSection = document.createElement('div');
             chainsSection.innerHTML = '<h2>Move Chains</h2>';
             
