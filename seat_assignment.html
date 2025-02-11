@@ -702,16 +702,15 @@
         function displayMoveChains(chains) {
             const resultsContainer = document.getElementById('resultsContainer');
             
-            // // Remove existing move chains section if it exists
-            // const existingChainsSections = resultsContainer.querySelectorAll('div');
-            // existingChainsSections.forEach(section => {
-            //     if (section.querySelector('h2') && section.querySelector('h2').textContent === 'Move Chains') {
-            //         section.remove();
-            //     }
-            // });
+            // Remove existing move chains section if it exists
+            const existingChainsSection = resultsContainer.querySelector('.move-chains-section');
+            if (existingChainsSection) {
+                existingChainsSection.remove();
+            }
             
-            // Create new move chains section
+            // Create new move chains section with a specific class
             const chainsSection = document.createElement('div');
+            chainsSection.className = 'move-chains-section';  // Add specific class for easier targeting
             chainsSection.innerHTML = '<h2>Move Chains</h2>';
             
             if (chains.length === 0) {
