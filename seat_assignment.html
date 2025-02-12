@@ -612,7 +612,8 @@
                     if (!nextStudent) {
                         chain.push({
                             student: newAssignedSeat.toString(),
-                            currentSeat: null
+                            currentSeat: null,
+                            isEmptySeat: true
                         });
                         if (chain.length > 1) {
                             mergeOrAddChain(chains, chain);
