@@ -6,7 +6,7 @@ This repository provides a simple interface to determine where to sit in CVLab.
 You have two files to control the seat assignment: `students.txt`, and `cvlab_seat_preference.csv`.
 
 - `students.txt` should contain names of all students who participate to the raffle.
-Students with priorities are marked with asterisks.
+Students with priorities are marked with an asterisk.
 
 - `cvlab_seat_preference.csv` shows seat preferences of each student. 
 Each row contains {name}, {current seat}, {preference sequence} of a student.
