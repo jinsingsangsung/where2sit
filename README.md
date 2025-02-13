@@ -19,4 +19,4 @@ and make people fill out the shared google spreadsheet. Make sure all people to 
 ### Run the seat assignment
 Once you completed the above step, you may update both files of the repository.
 Now you can go to https://jinsingsangsung.github.io/where2sit/seat_assignment.html to start the raffle!
-The current version of the program can not handle some edge case of move chain, but still shows a valid cycles.
+The current version of the program can not handle some edge case of move chain, but still shows valid cycles.
